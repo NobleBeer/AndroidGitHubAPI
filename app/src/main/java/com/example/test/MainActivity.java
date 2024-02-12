@@ -1,5 +1,8 @@
 package com.example.test;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,11 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private Button backButton;
 
     private GitHubService gitHubService;
+    private DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dbHelper = new DBHelper(this);
 
         orgEditText = findViewById(R.id.orgEditText);
         searchButton = findViewById(R.id.searchButton);
@@ -63,9 +70,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void performSearch() {
         String orgName = orgEditText.getText().toString();
         if (!orgName.isEmpty()) {
+            saveQuery(orgName);
+
             orgEditText.setVisibility(View.GONE);
             searchButton.setVisibility(View.GONE);
             userTextView.setVisibility(View.VISIBLE);
@@ -73,8 +83,31 @@ public class MainActivity extends AppCompatActivity {
 
             getRepositories(orgName);
         } else {
-            Toast.makeText(MainActivity.this, "Введите название организации", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Введите название организации",
+                    Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void saveQuery(String query) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DBHelper.COLUMN_QUERY, query);
+        db.insert(DBHelper.TABLE_NAME, null, values);
+    }
+
+    private List<String> getHistory() {
+        List<String> historyList = new ArrayList<>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DBHelper.TABLE_NAME, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String query = cursor.getString(cursor
+                        .getColumnIndexOrThrow(DBHelper.COLUMN_QUERY));
+                historyList.add(query);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return historyList;
     }
 
     private void getRepositories(String name) {
