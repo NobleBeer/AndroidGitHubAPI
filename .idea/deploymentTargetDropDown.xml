@@ -8,6 +8,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="testGetHistory()">
+        <State />
+      </entry>
       <entry key="testSaveQuery()">
         <State />
       </entry>

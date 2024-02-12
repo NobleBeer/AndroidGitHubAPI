@@ -33,7 +33,10 @@ public class RepositoryAdapter extends ArrayAdapter<Repository> {
         TextView textView = convertView.findViewById(android.R.id.text1);
 
         SpannableStringBuilder builder = new SpannableStringBuilder(Objects
-                .requireNonNull(repository).getName() + "\n" + repository.getLanguage());
+                .requireNonNull(repository).getName() + "\n");
+        if (repository.getLanguage() != null) {
+            builder.append(repository.getLanguage());
+        }
         if (repository.getDescription() != null) {
             builder.append(" ").append(repository.getDescription());
         }
