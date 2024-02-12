@@ -1,7 +1,6 @@
 package com.example.test;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -49,18 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         searchButton.setOnClickListener(v -> performSearch());
 
-        /* orgEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-                    (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
-                            event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                performSearch();
-                return true;
-            }
-            return false;
-        });
-
-
-         */
         backButton.setOnClickListener(v -> {
             orgEditText.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.VISIBLE);
@@ -92,22 +78,6 @@ public class MainActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(DBHelper.COLUMN_QUERY, query);
         db.insert(DBHelper.TABLE_NAME, null, values);
-    }
-
-    // А если эту срань прикрутить для истории поиска
-    private List<String> getHistory() {
-        List<String> historyList = new ArrayList<>();
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + DBHelper.TABLE_NAME, null);
-        if (cursor.moveToFirst()) {
-            do {
-                String query = cursor.getString(cursor
-                        .getColumnIndexOrThrow(DBHelper.COLUMN_QUERY));
-                historyList.add(query);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return historyList;
     }
 
     private void getRepositories(String name) {
