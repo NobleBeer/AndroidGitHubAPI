@@ -4,9 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -51,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         searchButton.setOnClickListener(v -> performSearch());
 
-        orgEditText.setOnEditorActionListener((v, actionId, event) -> {
+        /* orgEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                     (event != null && event.getAction() == KeyEvent.ACTION_DOWN &&
                             event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -61,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
+
+         */
         backButton.setOnClickListener(v -> {
             orgEditText.setVisibility(View.VISIBLE);
             searchButton.setVisibility(View.VISIBLE);
@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
             repoListView.setAdapter(null);
         });
     }
-
 
     private void performSearch() {
         String orgName = orgEditText.getText().toString();
@@ -95,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         db.insert(DBHelper.TABLE_NAME, null, values);
     }
 
+    // А если эту срань прикрутить для истории поиска
     private List<String> getHistory() {
         List<String> historyList = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -114,11 +114,13 @@ public class MainActivity extends AppCompatActivity {
         Call<List<Repository>> call = gitHubService.getRepositories(name);
         call.enqueue(new Callback<List<Repository>>() {
             @Override
-            public void onResponse(Call<List<Repository>> call, Response<List<Repository>> response) {
+            public void onResponse(Call<List<Repository>> call,
+                                   Response<List<Repository>> response) {
                 if (response.isSuccessful()) {
                     List<Repository> repositories = response.body();
                     if (repositories != null && !repositories.isEmpty()) {
-                        RepositoryAdapter adapter = new RepositoryAdapter(MainActivity.this, repositories);
+                        RepositoryAdapter adapter = new RepositoryAdapter(MainActivity.this,
+                                repositories);
                         repoListView.setAdapter(adapter);
 
                         orgEditText.setVisibility(View.GONE);
@@ -127,16 +129,19 @@ public class MainActivity extends AppCompatActivity {
                         userTextView.setText(name);
                         backButton.setVisibility(View.VISIBLE);
                     } else {
-                        Toast.makeText(MainActivity.this, "Репозитории не найдены", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Репозитории не найдены",
+                                Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "Ошибка: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Ошибка: " + response.code(),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Repository>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Ошибка сети: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
